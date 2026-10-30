@@ -1,0 +1,29 @@
+{
+  "id": "reader-compact",
+  "name": "紧凑阅读器",
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "description": "接管阅读视图的示例插件：显示发件人/主题，并以紧凑排版渲染正文",
+  "author": "MailForge",
+  "permissions": [
+    "read:email-meta",
+    "read:email-body"
+  ],
+  "contributes": {
+    "readerView": "view.html",
+    "commands": [
+      {
+        "id": "reader.summary",
+        "label": "紧凑阅读器：摘要当前邮件",
+        "menu": "context:reader",
+        "when": "readerView"
+      },
+      {
+        "id": "reader.export",
+        "label": "紧凑阅读器：导出（需临时文件权限）",
+        "menu": "context:reader",
+        "requires": "fs:temp"
+      }
+    ]
+  }
+}

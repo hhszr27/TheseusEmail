@@ -1,0 +1,46 @@
+{
+  "id": "panel-note",
+  "name": "SafetyHelper",
+  "version": "1.1.0",
+  "apiVersion": 1,
+  "description": "插件示例：贡献一个账户右键菜单项，并往工具栏追加一个自建标签页（演示 contributes.ribbon）。",
+  "author": "MailForge",
+  "permissions": [
+    "read:email-meta",
+    "read:email-body"
+  ],
+  "contributes": {
+    "views": {
+      "panel": "view.html"
+    },
+    "commands": [
+      {
+        "id": "panel.account",
+        "label": "面板：查看账户",
+        "description": "仅在启用的账户上出现",
+        "menu": "context:account",
+        "when": "accountEnabled"
+      }
+    ],
+    "ribbon": {
+      "tabs": [
+        {
+          "id": "helper",
+          "label": "SafetyHelper",
+          "order": 100
+        }
+      ],
+      "tools": [
+        {
+          "tab": "helper",
+          "id": "account",
+          "label": "查看账户",
+          "command": "panel.account",
+          "icon": "plugin",
+          "when": "always",
+          "order": 10
+        }
+      ]
+    }
+  }
+}

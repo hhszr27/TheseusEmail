@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>解锁 MailForge</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #12161c;
+        --panel: #1a2028;
+        --text: #e8edf3;
+        --muted: #9aa7b4;
+        --accent: #5b9dff;
+        --danger: #e07a7a;
+        --border: #2b3441;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 14px/1.5 "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      .card { width: 100%; max-width: 380px; padding: 28px; }
+      h1 { font-size: 18px; margin: 0 0 6px; }
+      p { color: var(--muted); margin: 0 0 18px; }
+      input {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--panel);
+        color: var(--text);
+        font-size: 14px;
+      }
+      input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+      .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+      button {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--panel);
+        color: var(--text);
+        cursor: pointer;
+      }
+      button.primary { background: var(--accent); border-color: var(--accent); color: #07101c; font-weight: 600; }
+      .error { color: var(--danger); min-height: 20px; margin-top: 10px; font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <h1>解锁 MailForge</h1>
+      <p>此设备已启用主密码。请输入主密码以解密本地数据库。</p>
+      <form id="form">
+        <input
+          id="password"
+          type="password"
+          autocomplete="current-password"
+          placeholder="主密码"
+          aria-label="主密码"
+          autofocus
+        />
+        <div class="error" id="error" role="alert"></div>
+        <div class="actions">
+          <button type="button" id="cancel">退出</button>
+          <button type="submit" class="primary" id="submit">解锁</button>
+        </div>
+      </form>
+    </main>
+    <script type="module" src="./unlock.ts"></script>
+  </body>
+</html>

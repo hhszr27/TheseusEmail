@@ -1,0 +1,33 @@
+/* MailForge 抬升与动效令牌「应用层」（§美化）
+ *
+ * 这是刻意保持「冷」的样式层：只覆盖 styles.css 里少数几个高频组件的阴影 / 过渡，
+ * 把它们从散落的硬编码值（120ms ease、0.12s、--mf-shadow-panel）统一到
+ * 视觉契约（contract.css）的 --mf-shadow-* / --mf-duration-* / --mf-easing-standard /
+ * --mf-motion 令牌，建立全应用一致的抬升与动效语言。
+ *
+ * 加载顺序：必须在 contract.css 与 styles.css 之后（main / recovery / reader 入口的
+ * import 顺序保证），才能用「同特异度、后定义」的规则覆盖 styles.css 里的旧值。
+ * 这样本次美化完全不碰 styles.css 这个并发热区。
+ *
+ * 纪律：本文件只允许引用 var(--mf-*)，不得出现硬编码颜色 / 阴影 / 时长。
+ */
+
+/* 对话框卡片：浮层用「卡片级」三级抬升（比 60px 面板阴影更克制、更现代），
+   并把阴影切换纳入统一过渡，未来做入场动效时自然顺滑。 */
+.dialog-card {
+  box-shadow: var(--mf-shadow-3);
+  transition: box-shadow var(--mf-motion);
+}
+
+/* 按钮：统一到「快速时长 + 标准缓动」（替代 120ms ease 的硬编码手感），
+   悬停/禁用态的背景与描边切换因此全应用同一套曲线。 */
+.btn {
+  transition: background var(--mf-duration-fast) var(--mf-easing-standard),
+    border-color var(--mf-duration-fast) var(--mf-easing-standard);
+}
+
+/* 邮件列表项：悬停/选中背景切换统一到令牌过渡（替代 0.12s 硬编码），
+   只过渡 background，不拖累虚拟滚动的 translateY 定位。 */
+.mail-item {
+  transition: background var(--mf-duration-fast) var(--mf-easing-standard);
+}

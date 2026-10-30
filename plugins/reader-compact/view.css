@@ -1,0 +1,78 @@
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+  background: #ffffff;
+  color: #1a1a1a;
+}
+
+.view-header {
+  padding: 14px 20px 12px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #f7f9fb;
+}
+
+.view-badge {
+  color: #1f6feb;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.view-subject {
+  margin: 6px 0 4px;
+  font-size: 20px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.view-from {
+  color: #555555;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.view-body {
+  padding: 18px 22px 32px;
+  font-size: 14px;
+  line-height: 1.65;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+}
+
+.view-body img {
+  max-width: 100%;
+  height: auto;
+}
+
+.view-body table {
+  border-collapse: collapse;
+  max-width: 100%;
+}
+
+.view-body td,
+.view-body th {
+  border: 1px solid #e0e0e0;
+  padding: 6px 8px;
+}
+
+.view-body blockquote {
+  margin: 12px 0;
+  padding-left: 12px;
+  border-left: 3px solid #e0e0e0;
+  color: #555555;
+}
+
+.view-body a {
+  color: #1f6feb;
+}
+
+.view-empty {
+  color: #6f8091;
+}

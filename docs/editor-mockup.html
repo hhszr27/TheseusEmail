@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DragonEmail · 富文本编辑器模拟（Outlook 风格）</title>
+<style>
+  :root {
+    --mf-color-bg: #f3f4f6;
+    --mf-color-surface-raised: #fafbfc;
+    --mf-color-text: #1a1a1a;
+    --mf-color-text-secondary: #6b7280;
+    --mf-color-text-muted: #9ca3af;
+    --mf-color-border: #e5e7eb;
+    --mf-color-border-strong: #d1d5db;
+    --mf-color-primary: #2563eb;
+    --mf-radius-sm: 6px;
+    --mf-font: -apple-system, "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: var(--mf-font);
+    background: #e9ecef;
+    color: var(--mf-color-text);
+    -webkit-font-smoothing: antialiased;
+  }
+  .topbar {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    background: #1f2937;
+    color: #e6edf3;
+    font-size: 13px;
+  }
+  .topbar .logo { font-weight: 700; letter-spacing: .3px; }
+  .topbar .hint { color: #9aa7b4; font-size: 12px; }
+  .stage { padding: 22px; display: flex; justify-content: center; }
+
+  /* —— 写信窗口卡片 —— */
+  .compose {
+    width: 100%;
+    max-width: 1040px;
+    background: #fff;
+    border: 1px solid var(--mf-color-border);
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(15,20,25,.12);
+    overflow: hidden;
+  }
+  .compose-title {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--mf-color-surface-raised);
+    border-bottom: 1px solid var(--mf-color-border);
+    font-size: 14px; font-weight: 600;
+  }
+  .compose-title .win-btns { display: flex; gap: 6px; }
+  .compose-title .win-btns i {
+    width: 12px; height: 12px; border-radius: 50%; display: inline-block; cursor: pointer;
+  }
+  .win-btns .r { background: #ff5f57; } .win-btns .y { background: #febc2e; } .win-btns .g { background: #28c840; }
+
+  /* —— 地址字段 —— */
+  .fields { border-bottom: 1px solid var(--mf-color-border); }
+  .field-row { display: flex; align-items: center; min-height: 38px; border-bottom: 1px solid var(--mf-color-border); }
+  .field-row:last-child { border-bottom: none; }
+  .field-label {
+    flex: 0 0 64px; text-align: right; padding-right: 12px;
+    color: var(--mf-color-text-secondary); font-size: 13px;
+  }
+  .field-input {
+    flex: 1; border: none; outline: none; font: inherit; font-size: 13px;
+    padding: 8px 10px; background: transparent; color: var(--mf-color-text);
+  }
+  .field-input::placeholder { color: var(--mf-color-text-muted); }
+
+  /* —— 工具栏 —— */
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 4px 2px; align-items: center;
+    padding: 6px 8px;
+    background: var(--mf-color-surface-raised);
+    border-bottom: 1px solid var(--mf-color-border);
+    position: sticky; top: 0; z-index: 5;
+  }
+  .tgroup { display: flex; align-items: center; gap: 2px; padding: 2px 6px; border-right: 1px solid var(--mf-color-border); }
+  .tgroup:last-child { border-right: none; }
+  .tbtn {
+    min-width: 30px; height: 30px; padding: 0 7px;
+    border: 1px solid transparent; border-radius: var(--mf-radius-sm);
+    background: transparent; color: var(--mf-color-text);
+    font: inherit; font-size: 13px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+  }
+  .tbtn:hover { background: #eef2f7; }
+  .tbtn.active { background: #dbeafe; border-color: #bfdbfe; color: var(--mf-color-primary); }
+  .tbtn b { font-weight: 800; } .tbtn i { font-style: italic; } .tbtn u { text-decoration: underline; }
+  .tbtn s { text-decoration: line-through; }
+  .tsep { width: 1px; height: 20px; background: var(--mf-color-border); margin: 0 4px; }
+  select.tbtn { height: 30px; }
+  .swatch { width: 16px; height: 16px; border-radius: 3px; border: 1px solid var(--mf-color-border-strong); }
+  .swatch-wrap { position: relative; }
+  .swatch-wrap input[type=color] {
+    position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; border: none;
+  }
+  .tbadge { font-size: 9px; vertical-align: super; color: var(--mf-color-text-muted); margin-left: 1px; }
+
+  /* —— 地址输入条（替代 window.prompt）—— */
+  .address-bar {
+    display: none; align-items: center; gap: 8px; padding: 8px 10px;
+    background: #eef2f7; border-bottom: 1px solid var(--mf-color-border); font-size: 13px;
+  }
+  .address-bar.show { display: flex; }
+  .address-bar input {
+    flex: 1; min-width: 0; height: 30px; padding: 0 10px; font: inherit;
+    border: 1px solid var(--mf-color-border-strong); border-radius: var(--mf-radius-sm);
+  }
+  .btn { height: 30px; padding: 0 12px; border-radius: var(--mf-radius-sm); border: 1px solid var(--mf-color-border-strong); background: #fff; cursor: pointer; font: inherit; font-size: 13px; }
+  .btn-primary { background: var(--mf-color-primary); color: #fff; border-color: var(--mf-color-primary); }
+
+  /* —— 正文编辑区 —— */
+  .editor {
+    min-height: 360px; padding: 16px 18px; outline: none; font-size: 14px; line-height: 1.6;
+    background: #fff;
+  }
+  .editor:focus { box-shadow: inset 0 0 0 2px #bfdbfe; }
+  .editor h1 { font-size: 20px; margin: 12px 0 8px; }
+  .editor h2 { font-size: 17px; margin: 10px 0 6px; }
+  .editor h3 { font-size: 15px; margin: 8px 0 6px; }
+  .editor p { margin: 0 0 8px; }
+  .editor blockquote { margin: 8px 0; padding-left: 10px; border-left: 3px solid var(--mf-color-border-strong); color: var(--mf-color-text-secondary); }
+  .editor pre { background: #f3f4f6; padding: 8px; border-radius: var(--mf-radius-sm); overflow: auto; }
+  .editor table { border-collapse: collapse; width: 100%; margin: 8px 0; }
+  .editor th, .editor td { border: 1px solid var(--mf-color-border-strong); padding: 5px 9px; vertical-align: top; }
+  .editor th { background: #f3f4f6; font-weight: 600; }
+  .editor img { max-width: 100%; }
+  .editor a { color: var(--mf-color-primary); }
+
+  .compose-foot {
+    display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+    border-top: 1px solid var(--mf-color-border); background: var(--mf-color-surface-raised);
+  }
+  .send-btn { background: var(--mf-color-primary); color: #fff; border: none; height: 34px; padding: 0 20px; border-radius: var(--mf-radius-sm); font: inherit; font-weight: 600; cursor: pointer; }
+  .foot-hint { color: var(--mf-color-text-muted); font-size: 12px; }
+
+  /* —— 路线图图例 —— */
+  .legend { max-width: 1040px; margin: 18px auto 40px; padding: 0 4px; }
+  .legend h3 { font-size: 14px; margin: 0 0 10px; }
+  .legend .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .legend .card { background: #fff; border: 1px solid var(--mf-color-border); border-radius: 10px; padding: 14px; }
+  .legend .card h4 { margin: 0 0 8px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+  .legend .tag { font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 600; }
+  .tag.p0 { background: #dcfce7; color: #166534; } .tag.p1 { background: #fef9c3; color: #854d0e; } .tag.p2 { background: #ede9fe; color: #5b21b6; }
+  .legend ul { margin: 0; padding-left: 18px; font-size: 12.5px; color: var(--mf-color-text-secondary); line-height: 1.7; }
+  .note { font-size: 12.5px; color: var(--mf-color-text-muted); line-height: 1.7; max-width: 1040px; margin: 0 auto 30px; padding: 0 4px; }
+  .note code { background: #eef2f7; padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <span class="logo">DragonEmail</span>
+    <span class="hint">富文本编辑器模拟 · 这是纯 HTML 演示，所有按钮都可真点（基于浏览器原生 contentEditable）</span>
+  </div>
+
+  <div class="stage">
+    <div class="compose">
+      <div class="compose-title">
+        <span>新邮件</span>
+        <span class="win-btns"><i class="r"></i><i class="y"></i><i class="g"></i></span>
+      </div>
+
+      <div class="fields">
+        <div class="field-row"><div class="field-label">发件人</div><input class="field-input" value="me@dragonemail.app" readonly style="color:var(--mf-color-text-muted)" /></div>
+        <div class="field-row"><div class="field-label">收件人</div><input class="field-input" placeholder="输入收件人地址…" /></div>
+        <div class="field-row"><div class="field-label">抄送</div><input class="field-input" placeholder="抄送（可选）" /></div>
+        <div class="field-row"><div class="field-label">密送</div><input class="field-input" placeholder="密送（可选）" /></div>
+        <div class="field-row"><div class="field-label">主题</div><input class="field-input" placeholder="邮件主题" value="Q3 季度汇报与下周安排" /></div>
+      </div>
+
+      <!-- 工具栏：分组即 P0/P1/P2 的落点 -->
+      <div class="toolbar" id="toolbar">
+        <div class="tgroup">
+          <select class="tbtn" id="fontName" title="字体">
+            <option value="inherit">字体</option>
+            <option value="Microsoft YaHei">微软雅黑</option>
+            <option value="SimSun">宋体</option>
+            <option value="KaiTi">楷体</option>
+            <option value="Arial">Arial</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Consolas">Consolas</option>
+          </select>
+          <select class="tbtn" id="fontSize" title="字号">
+            <option value="3">字号</option>
+            <option value="1">小</option>
+            <option value="3">正文</option>
+            <option value="5">大</option>
+            <option value="6">特大</option>
+            <option value="7">最大</option>
+          </select>
+        </div>
+
+        <div class="tgroup">
+          <button class="tbtn" data-cmd="bold" title="加粗"><b>B</b></button>
+          <button class="tbtn" data-cmd="italic" title="斜体"><i>I</i></button>
+          <button class="tbtn" data-cmd="underline" title="下划线"><u>U</u></button>
+          <button class="tbtn" data-cmd="strikeThrough" title="删除线"><s>S</s></button>
+          <button class="tbtn" data-cmd="subscript" title="下标">x₂</button>
+          <button class="tbtn" data-cmd="superscript" title="上标">x²</button>
+          <span class="swatch-wrap tbtn" title="字体颜色">
+            <span class="swatch" style="background:#1a1a1a"></span>
+            <input type="color" id="foreColor" value="#1a1a1a" />
+          </span>
+          <span class="swatch-wrap tbtn" title="文本突出显示">
+            <span class="swatch" style="background:#fde047"></span>
+            <input type="color" id="hiliteColor" value="#fde047" />
+          </span>
+        </div>
+
+        <div class="tgroup">
+          <button class="tbtn" data-cmd="insertUnorderedList" title="项目符号">•</button>
+          <button class="tbtn" data-cmd="insertOrderedList" title="编号">1.</button>
+          <button class="tbtn" data-cmd="outdent" title="减少缩进">⇤</button>
+          <button class="tbtn" data-cmd="indent" title="增加缩进">⇥</button>
+          <button class="tbtn" data-cmd="justifyLeft" title="左对齐">⬅</button>
+          <button class="tbtn" data-cmd="justifyCenter" title="居中">⬌</button>
+          <button class="tbtn" data-cmd="justifyRight" title="右对齐">➡</button>
+        </div>
+
+        <div class="tgroup">
+          <button class="tbtn" data-block="h1" title="标题 1">H1</button>
+          <button class="tbtn" data-block="h2" title="标题 2">H2</button>
+          <button class="tbtn" data-block="h3" title="标题 3">H3</button>
+          <button class="tbtn" data-cmd="formatBlock" data-value="blockquote" title="引用">❝</button>
+          <button class="tbtn" data-cmd="formatBlock" data-value="pre" title="代码块">&lt;/&gt;</button>
+        </div>
+
+        <div class="tgroup">
+          <button class="tbtn" id="insertLink" title="插入链接">🔗 链接</button>
+          <button class="tbtn" id="insertImage" title="插入图片">🖼 图片<span class="tbadge">P0</span></button>
+          <button class="tbtn" id="insertTable" title="插入表格（3×3）">▦ 表格<span class="tbadge">P0</span></button>
+        </div>
+
+        <div class="tgroup">
+          <button class="tbtn" id="insertEmoji" title="表情">😊 表情<span class="tbadge">P1</span></button>
+          <button class="tbtn" id="insertSig" title="插入签名">✍ 签名<span class="tbadge">P1</span></button>
+          <button class="tbtn" id="insertTpl" title="插入模板">📄 模板<span class="tbadge">P1</span></button>
+        </div>
+
+        <div class="tgroup">
+          <button class="tbtn" id="formatPainter" title="格式刷">🖌 格式刷<span class="tbadge">P1</span></button>
+          <button class="tbtn" id="findReplace" title="查找 / 替换">🔍 查找<span class="tbadge">P1</span></button>
+          <button class="tbtn" id="viewSource" title="HTML 源码视图">⟨⟩ 源码<span class="tbadge">P2</span></button>
+        </div>
+      </div>
+
+      <!-- 链接 / 图片地址输入条（Electron 里不能用 prompt，这里也是内联条） -->
+      <div class="address-bar" id="addrBar">
+        <span id="addrLabel">地址</span>
+        <input id="addrInput" placeholder="https://…" />
+        <button class="btn btn-primary" id="addrOk">确定</button>
+        <button class="btn" id="addrCancel">取消</button>
+      </div>
+
+      <!-- 查找替换内联条 -->
+      <div class="address-bar" id="findBar">
+        <span>查找</span><input id="findInput" placeholder="要找的文字" />
+        <span>替换</span><input id="replaceInput" placeholder="替换成" />
+        <button class="btn btn-primary" id="findOk">替换全部</button>
+        <button class="btn" id="findCancel">取消</button>
+      </div>
+
+      <!-- 表情选择条 -->
+      <div class="address-bar" id="emojiBar">
+        <span>选择表情</span>
+        <span id="emojiList" style="display:flex;gap:6px;flex-wrap:wrap"></span>
+        <button class="btn" id="emojiCancel">关闭</button>
+      </div>
+
+      <div class="editor" id="editor" contenteditable="true">
+        <h2>Q3 季度汇报</h2>
+        <p>各位好，本季度核心指标<strong>稳步提升</strong>，其中<font color="#dc2626">活跃用户</font>环比增长 <u>18%</u>。下面是关键数据：</p>
+        <table>
+          <thead><tr><th>指标</th><th>Q2</th><th>Q3</th><th>环比</th></tr></thead>
+          <tbody>
+            <tr><td>活跃用户</td><td>1.2M</td><td>1.42M</td><td>+18%</td></tr>
+            <tr><td>留存率</td><td>41%</td><td>46%</td><td>+5pt</td></tr>
+            <tr><td>客单价</td><td>¥89</td><td>¥96</td><td>+8%</td></tr>
+          </tbody>
+        </table>
+        <p>下周重点：① 上线<em>富文本编辑器</em>；② 推进 CID 内嵌图片方案。</p>
+        <blockquote>注：以上数据未经审计，正式版见附件。</blockquote>
+      </div>
+
+      <div class="compose-foot">
+        <button class="send-btn">发送</button>
+        <span class="foot-hint">提示：选中文字再点工具栏即可实时排版 · 点「源码」看最终 HTML</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <h3>演进路线图（对应之前讨论的 P0 / P1 / P2）</h3>
+    <div class="cols">
+      <div class="card">
+        <h4><span class="tag p0">P0</span> 基础丰富度（一轮可做）</h4>
+        <ul>
+          <li>字体族 / 字号 / 字体颜色 / 高亮</li>
+          <li>上标 / 下标</li>
+          <li>段落缩进（增减）</li>
+          <li>3×3 表格 + 表内加行/列/合并</li>
+          <li>字数统计</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="tag p1">P1</span> 像 Outlook 的体感（一轮可做）</h4>
+        <ul>
+          <li>签名 + 默认模板自动插入</li>
+          <li>表情面板</li>
+          <li>格式刷</li>
+          <li>查找 / 替换</li>
+          <li>粘贴三档（保留 / 合并 / 纯文本）</li>
+          <li>图片拖拽改尺寸</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="tag p2">P2</span> 邮件专属（需改 MIME）</h4>
+        <ul>
+          <li>图片走 CID 内嵌附件（替换 data URL）</li>
+          <li>发送前 HTML 归一化 + 兼容性提示</li>
+          <li>HTML 源码视图（本演示已可点）</li>
+          <li>表格导出为内联样式兼容 Outlook</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <p class="note">
+    说明：模拟界面用浏览器原生 <code>contentEditable</code> 实现，逻辑与 App 里的 Tiptap 编辑器等价（加粗→<code>&lt;strong&gt;</code>、表格→<code>&lt;table&gt;</code> 等）。
+    真正的 App 里，图片/链接走<strong>内联地址条</strong>而非 <code>window.prompt</code>（Electron 渲染进程不实现 prompt）；
+    正文在发送前会过主进程 <code>sanitizeComposeHtml()</code> 权威净化。三个必须接受的邮件约束：① Outlook 桌面版不支持 flex/grid，依赖内联样式；
+    ② 不能用 <code>&lt;style&gt;</code> 块；③ 截图目前内联成 base64，正式版走 CID。
+  </p>
+
+<script>
+(function () {
+  const editor = document.getElementById('editor');
+  const toolbar = document.getElementById('toolbar');
+  document.execCommand('styleWithCSS', false, true);
+
+  function exec(cmd, value) {
+    editor.focus();
+    document.execCommand(cmd, false, value || null);
+    syncState();
+  }
+
+  // 基础命令按钮
+  toolbar.querySelectorAll('[data-cmd]').forEach((btn) => {
+    btn.addEventListener('mousedown', (e) => e.preventDefault()); // 不抢选区
+    btn.addEventListener('click', () => {
+      const cmd = btn.dataset.cmd;
+      if (cmd === 'formatBlock') exec(cmd, btn.dataset.value);
+      else exec(cmd);
+    });
+  });
+  // 块级标题
+  toolbar.querySelectorAll('[data-block]').forEach((btn) => {
+    btn.addEventListener('mousedown', (e) => e.preventDefault());
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.block;
+      const cur = document.queryCommandValue('formatBlock').toLowerCase();
+      exec('formatBlock', cur === tag ? 'p' : tag);
+    });
+  });
+
+  // 字体 / 字号
+  document.getElementById('fontName').addEventListener('change', (e) => { exec('fontName', e.target.value); e.target.blur(); });
+  document.getElementById('fontSize').addEventListener('change', (e) => { exec('fontSize', e.target.value); e.target.blur(); });
+  document.getElementById('foreColor').addEventListener('input', (e) => exec('foreColor', e.target.value));
+  document.getElementById('hiliteColor').addEventListener('input', (e) => exec('hiliteColor', e.target.value));
+
+  // 高亮按钮激活态
+  function syncState() {
+    toolbar.querySelectorAll('[data-cmd]').forEach((b) => {
+      let on = false;
+      try { on = document.queryCommandState(b.dataset.cmd); } catch (_) {}
+      b.classList.toggle('active', on);
+    });
+  }
+  editor.addEventListener('keyup', syncState);
+  editor.addEventListener('mouseup', syncState);
+  syncState();
+
+  // —— 链接 / 图片：内联地址条（不用 window.prompt）——
+  const addrBar = document.getElementById('addrBar');
+  const addrInput = document.getElementById('addrInput');
+  const addrLabel = document.getElementById('addrLabel');
+  let addrKind = 'link';
+  function openAddr(kind) {
+    addrKind = kind;
+    addrLabel.textContent = kind === 'link' ? '链接地址' : '图片地址';
+    addrInput.value = 'https://';
+    addrBar.classList.add('show');
+    addrInput.focus(); addrInput.select();
+  }
+  function applyAddr() {
+    const raw = addrInput.value.trim();
+    addrBar.classList.remove('show');
+    if (!raw) return;
+    const safe = /^(https?:|mailto:)/i.test(raw) ? raw : 'https://' + raw;
+    if (addrKind === 'link') exec('createLink', safe);
+    else exec('insertImage', safe);
+  }
+  document.getElementById('insertLink').addEventListener('click', () => openAddr('link'));
+  document.getElementById('insertImage').addEventListener('click', () => openAddr('image'));
+  document.getElementById('addrOk').addEventListener('click', applyAddr);
+  document.getElementById('addrCancel').addEventListener('click', () => addrBar.classList.remove('show'));
+  addrInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); applyAddr(); }
+    if (e.key === 'Escape') { e.preventDefault(); addrBar.classList.remove('show'); }
+  });
+
+  // —— 表格 ——
+  document.getElementById('insertTable').addEventListener('click', () => {
+    let rows = '';
+    for (let r = 0; r < 3; r++) {
+      rows += '<tr>' + '<td>单元格</td>'.repeat(3) + '</tr>';
+    }
+    exec('insertHTML', '<table><tbody>' + rows + '</tbody></table><p><br></p>');
+  });
+
+  // —— 表情 ——
+  const emojiBar = document.getElementById('emojiBar');
+  const emojiList = document.getElementById('emojiList');
+  const emojis = ['😊','👍','🎉','❤️','🚀','✅','⚠️','📌','💡','🔥','📈','🙏'];
+  emojis.forEach((em) => {
+    const s = document.createElement('span');
+    s.textContent = em; s.style.cursor = 'pointer'; s.style.fontSize = '20px';
+    s.addEventListener('click', () => { exec('insertText', em); emojiBar.classList.remove('show'); });
+    emojiList.appendChild(s);
+  });
+  document.getElementById('insertEmoji').addEventListener('click', () => emojiBar.classList.add('show'));
+  document.getElementById('emojiCancel').addEventListener('click', () => emojiBar.classList.remove('show'));
+
+  // —— 签名 / 模板 ——
+  document.getElementById('insertSig').addEventListener('click', () => {
+    exec('insertHTML', '<p><br></p><p style="color:#6b7280;font-size:12px">——<br>张三 · DragonEmail 团队<br>📧 me@dragonemail.app</p>');
+  });
+  document.getElementById('insertTpl').addEventListener('click', () => {
+    exec('insertHTML', '<p>您好，</p><p>关于______的事宜，现同步如下：</p><p>1. </p><p>2. </p><p>如有疑问请随时联系。</p><p>祝好</p>');
+  });
+
+  // —— 格式刷（简化版：记录行内格式并复用到下一次点击）——
+  let painter = null;
+  document.getElementById('formatPainter').addEventListener('click', (e) => {
+    e.currentTarget.classList.toggle('active');
+    const sel = window.getSelection();
+    if (!sel.rangeCount) { painter = null; return; }
+    const node = sel.getRangeAt(0).startContainer.parentElement;
+    if (!painter) {
+      painter = {
+        bold: document.queryCommandState('bold'),
+        italic: document.queryCommandState('italic'),
+        underline: document.queryCommandState('underline'),
+        color: getComputedStyle(node).color,
+      };
+      alert('已拾取格式，请选择要应用格式的文字');
+    } else {
+      if (painter.bold) exec('bold');
+      if (painter.italic) exec('italic');
+      if (painter.underline) exec('underline');
+      exec('foreColor', rgbToHex(painter.color));
+      painter = null; e.currentTarget.classList.remove('active');
+    }
+  });
+  function rgbToHex(rgb) {
+    const m = rgb.match(/\d+/g);
+    if (!m) return '#1a1a1a';
+    return '#' + m.slice(0, 3).map((x) => (+x).toString(16).padStart(2, '0')).join('');
+  }
+
+  // —— 查找 / 替换 ——
+  const findBar = document.getElementById('findBar');
+  document.getElementById('findReplace').addEventListener('click', () => findBar.classList.add('show'));
+  document.getElementById('findCancel').addEventListener('click', () => findBar.classList.remove('show'));
+  document.getElementById('findOk').addEventListener('click', () => {
+    const f = document.getElementById('findInput').value;
+    const r = document.getElementById('replaceInput').value;
+    if (!f) return;
+    const html = editor.innerHTML.split(f).join(r);
+    editor.innerHTML = html;
+    findBar.classList.remove('show');
+  });
+
+  // —— 源码视图 ——
+  const viewSource = document.getElementById('viewSource');
+  viewSource.addEventListener('click', () => {
+    const isSrc = editor.dataset.src === '1';
+    if (isSrc) {
+      editor.innerHTML = editor.textContent; // 还原（演示用）
+      editor.dataset.src = '0';
+      viewSource.classList.remove('active');
+    } else {
+      editor.dataset.src = '1';
+      viewSource.classList.add('active');
+      const pre = document.createElement('pre');
+      pre.textContent = editor.innerHTML;
+      editor.innerHTML = '';
+      editor.appendChild(pre);
+    }
+  });
+})();
+</script>
+</body>
+</html>

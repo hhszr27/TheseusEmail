@@ -1,0 +1,12 @@
+{
+  "id": "theme-nord",
+  "name": "Nord 主题",
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "description": "覆盖契约变量的插件主题示例（§13.5）",
+  "author": "MailForge",
+  "permissions": [],
+  "contributes": {
+    "theme": "theme.css"
+  }
+}

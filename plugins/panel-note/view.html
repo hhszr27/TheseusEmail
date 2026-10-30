@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SafetyHelper · 账户</title>
+    <style>
+      :root {
+        /* 兜底值跟随 v3.3 默认的浅色主题；深色由宿主下发 --mf-color-* 覆盖 */
+        --bg: var(--mf-color-bg, #f3f4f6);
+        --panel: var(--mf-color-surface, #ffffff);
+        --panel-raised: var(--mf-color-surface-raised, #fafbfc);
+        --hover: var(--mf-color-surface-hover, #f3f4f6);
+        --border: var(--mf-color-border, #e5e7eb);
+        --text: var(--mf-color-text, #1a1a1a);
+        --text2: var(--mf-color-text-secondary, #6b7280);
+        --muted: var(--mf-color-text-muted, #9ca3af);
+        --accent: var(--mf-color-accent, #2563eb);
+        --danger: var(--mf-color-danger, #dc2626);
+        --warning: var(--mf-color-warning, #ea580c);
+        --success: var(--mf-color-success, #16a34a);
+        --radius: var(--mf-radius-md, 8px);
+        --u: var(--mf-spacing-unit, 8px);
+        --font: var(--mf-font-family, system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif);
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font: 13px/1.5 var(--font);
+        padding: calc(var(--u) * 1.5);
+      }
+      h1 { font-size: 14px; margin: 0 0 2px; }
+      .sub { color: var(--muted); font-size: 12px; margin: 0 0 14px; }
+
+      .account {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: calc(var(--u) * 1.5);
+        margin-bottom: calc(var(--u) * 1.5);
+      }
+      .account-head { display: flex; align-items: center; gap: 12px; }
+      .avatar {
+        flex: 0 0 auto;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 17px;
+        color: #fff;
+        user-select: none;
+      }
+      .who { min-width: 0; flex: 1 1 auto; }
+      .name { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .email {
+        color: var(--text2);
+        font-size: 12px;
+        word-break: break-all;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .copy {
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--muted);
+        border-radius: 4px;
+        font-size: 10px;
+        padding: 0 5px;
+        cursor: pointer;
+        flex: 0 0 auto;
+      }
+      .copy:hover { color: var(--text); border-color: var(--text2); }
+
+      .section-title {
+        color: var(--muted);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin: 14px 0 6px;
+      }
+      .row { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; align-items: baseline; }
+      .row .k { color: var(--text2); flex: 0 0 auto; }
+      .row .v { text-align: right; color: var(--text); word-break: break-all; font-variant-numeric: tabular-nums; }
+      .mono { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: 12px; }
+
+      .badge {
+        display: inline-block;
+        padding: 1px 9px;
+        border-radius: 999px;
+        font-size: 11px;
+        border: 1px solid var(--border);
+        white-space: nowrap;
+      }
+      .badge.ok { color: var(--success); border-color: var(--success); }
+      .badge.warn { color: var(--warning); border-color: var(--warning); }
+      .badge.danger { color: var(--danger); border-color: var(--danger); }
+      .badge.muted { color: var(--muted); }
+
+      .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+      .stat {
+        background: var(--panel-raised);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 10px 12px;
+      }
+      .stat .num { font-size: 20px; font-weight: 700; line-height: 1.1; }
+      .stat .lbl { color: var(--muted); font-size: 11px; margin-top: 2px; }
+
+      .hint { color: var(--muted); font-size: 12px; }
+      .err { color: var(--danger); }
+      .retry {
+        border: 1px solid var(--border);
+        background: var(--panel-raised);
+        color: var(--text);
+        border-radius: 6px;
+        font-size: 12px;
+        padding: 4px 12px;
+        cursor: pointer;
+      }
+      .retry:hover { border-color: var(--accent); color: var(--accent); }
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 16px;
+        transform: translateX(-50%);
+        background: var(--panel-raised);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+        pointer-events: none;
+      }
+      .toast.show { opacity: 1; }
+    </style>
+  </head>
+  <body>
+    <h1>🔍 SafetyHelper</h1>
+    <p class="sub" id="sub">账户信息面板</p>
+    <div id="content"><p class="hint">正在加载账户…</p></div>
+    <div class="toast" id="toast"></div>
+
+    <script src="view.js" defer></script>
+  </body>
+</html>

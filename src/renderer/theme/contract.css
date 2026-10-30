@@ -1,0 +1,120 @@
+/* MailForge 视觉契约（§13.5）
+ * 组件只允许使用 var(--mf-*)，禁止硬编码颜色 / 字体 / 间距。
+ *
+ * v3.3 界面改版：默认浅色（与产品原型一致），深色为 [data-theme='dark'] 覆盖。
+ */
+:root {
+  --mf-color-bg: #f3f4f6;
+  --mf-color-surface: #ffffff;
+  --mf-color-surface-2: #fafbfc;
+  --mf-color-surface-raised: #fafbfc;
+  --mf-color-surface-hover: #f3f4f6;
+  --mf-color-hover: #f3f4f6;
+  --mf-color-selected: #eff6ff;
+
+  --mf-color-text: #1a1a1a;
+  --mf-color-text-secondary: #6b7280;
+  --mf-color-text-muted: #9ca3af;
+
+  --mf-color-accent: #2563eb;
+  --mf-color-accent-soft: #eff6ff;
+  --mf-color-accent-contrast: #ffffff;
+
+  --mf-color-border: #e5e7eb;
+  --mf-color-border-strong: #d1d5db;
+
+  --mf-color-danger: #dc2626;
+  --mf-color-danger-soft: #fef2f2;
+  --mf-color-warning: #ea580c;
+  --mf-color-suspicious: #ea580c;
+  --mf-color-suspicious-soft: #fff7ed;
+  --mf-color-unknown: #ca8a04;
+  --mf-color-unknown-soft: #fefce8;
+  --mf-color-success: #16a34a;
+  --mf-color-safe: #16a34a;
+
+  /* 邮件正文画布（阅读区按"纸张"渲染，避免 HTML 邮件的硬编码深色文字不可读） */
+  --mf-color-reader-bg: #ffffff;
+  --mf-color-reader-text: #242424;
+  --mf-color-reader-secondary: #555555;
+  --mf-color-reader-border: #e0e0e0;
+  --mf-color-reader-placeholder: #dfe3e8;
+
+  --mf-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --mf-font-mono: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+  --mf-font-size-sm: 12px;
+  --mf-font-size-md: 14px;
+  --mf-font-size-lg: 16px;
+  --mf-font-size-xl: 20px;
+
+  --mf-radius-sm: 4px;
+  --mf-radius-md: 8px;
+  --mf-radius-lg: 12px;
+
+  --mf-spacing-unit: 8px;
+  --mf-shadow-panel: 0 20px 60px rgba(0, 0, 0, 0.2);
+
+  /* 抬升层级：卡片/浮层共用一套有层次的阴影，替代散落的硬编码阴影（§美化） */
+  --mf-shadow-1: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.10);
+  --mf-shadow-2: 0 2px 6px rgba(16, 24, 40, 0.08), 0 4px 12px rgba(16, 24, 40, 0.12);
+  --mf-shadow-3: 0 8px 24px rgba(16, 24, 40, 0.12), 0 4px 8px rgba(16, 24, 40, 0.08);
+
+  /* 动效：统一的时长与缓动，组件交互过渡不再各写各的（§美化） */
+  --mf-duration-fast: 120ms;
+  --mf-duration-base: 200ms;
+  --mf-duration-slow: 320ms;
+  --mf-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --mf-motion: var(--mf-duration-base) var(--mf-easing-standard);
+}
+
+/* 内置深色主题：只覆盖变量，运行时切换无需重启（§13.5） */
+:root[data-theme='dark'] {
+  --mf-color-bg: #0f1419;
+  --mf-color-surface: #161d25;
+  --mf-color-surface-2: #1a222b;
+  --mf-color-surface-raised: #1d2732;
+  --mf-color-surface-hover: #222e3a;
+  --mf-color-hover: #222e3a;
+  --mf-color-selected: #1e2c3d;
+
+  --mf-color-text: #e6edf3;
+  --mf-color-text-secondary: #9aa7b4;
+  --mf-color-text-muted: #6b7785;
+
+  --mf-color-accent: #4c9aff;
+  --mf-color-accent-soft: #16263a;
+  --mf-color-accent-contrast: #0b1220;
+
+  --mf-color-border: #26313c;
+  --mf-color-border-strong: #354454;
+
+  --mf-color-danger: #e07a7a;
+  --mf-color-danger-soft: rgba(224, 122, 122, 0.14);
+  --mf-color-warning: #d9a441;
+  --mf-color-suspicious: #d9a441;
+  --mf-color-suspicious-soft: rgba(217, 164, 65, 0.14);
+  --mf-color-unknown: #d9c76a;
+  --mf-color-unknown-soft: rgba(217, 199, 106, 0.12);
+  --mf-color-success: #58b982;
+  --mf-color-safe: #58b982;
+
+  --mf-color-reader-bg: #ffffff;
+  --mf-color-reader-text: #242424;
+  --mf-color-reader-secondary: #555555;
+  --mf-color-reader-border: #e0e0e0;
+  --mf-color-reader-placeholder: #dfe3e8;
+
+  --mf-shadow-panel: 0 8px 24px rgba(0, 0, 0, 0.45);
+
+  /* 抬升层级：深色表面需要更实、更深的阴影才有层次（§美化） */
+  --mf-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.6);
+  --mf-shadow-2: 0 2px 6px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.6);
+  --mf-shadow-3: 0 8px 24px rgba(0, 0, 0, 0.6), 0 4px 8px rgba(0, 0, 0, 0.5);
+
+  /* 动效（与浅色一致） */
+  --mf-duration-fast: 120ms;
+  --mf-duration-base: 200ms;
+  --mf-duration-slow: 320ms;
+  --mf-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --mf-motion: var(--mf-duration-base) var(--mf-easing-standard);
+}

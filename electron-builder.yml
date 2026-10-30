@@ -1,0 +1,31 @@
+appId: com.mailforge.desktop
+productName: MailForge
+directories:
+  output: dist
+  buildResources: build
+files:
+  - out/**/*
+  - package.json
+extraResources:
+  - from: migrations
+    to: migrations
+  # 托盘/应用图标：运行时经 process.resourcesPath/icons 读取（见 src/main/app/tray.ts）
+  - from: build/icons
+    to: icons
+asarUnpack:
+  - node_modules/better-sqlite3-multiple-ciphers/**/*
+win:
+  icon: build/icons/icon.ico
+  target:
+    - nsis
+mac:
+  target:
+    - dmg
+  category: public.app-category.productivity
+linux:
+  target:
+    - AppImage
+  category: Network
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true

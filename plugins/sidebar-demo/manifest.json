@@ -1,0 +1,14 @@
+{
+  "id": "sidebar-demo",
+  "name": "侧栏示例",
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "description": "演示 views.sidebar-item：在侧栏底部导航（邮件 / 日历 / 联系人旁边）贡献一个图标，点击后主区域渲染本插件页面。",
+  "author": "MailForge",
+  "permissions": ["read:email-meta"],
+  "contributes": {
+    "views": {
+      "sidebar-item": "view.html"
+    }
+  }
+}

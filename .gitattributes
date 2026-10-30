@@ -1,0 +1,10 @@
+# 统一换行符：仓库内一律以 LF 存储，跨平台检出保持一致
+* text=auto eol=lf
+
+# 明确二进制的文件，不做换行符转换
+*.png binary
+*.ico binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary

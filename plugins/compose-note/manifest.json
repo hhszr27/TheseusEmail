@@ -1,0 +1,31 @@
+{
+  "id": "compose-note",
+  "name": "简洁撰写器",
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "description": "整体接管撰写窗口的示例插件（默认停用）：启用后演示 compose-view 草稿读写",
+  "author": "MailForge",
+  "permissions": [
+    "read:email-body",
+    "write:draft"
+  ],
+  "contributes": {
+    "composeView": "compose.html",
+    "commands": [
+      {
+        "id": "compose.signature",
+        "label": "插入署名",
+        "description": "通过 setDraftContent 写回署名",
+        "menu": "context:compose",
+        "when": "composeOpen",
+        "requires": "write:draft"
+      },
+      {
+        "id": "compose.settings",
+        "label": "简洁撰写器：设置",
+        "menu": "main"
+      }
+    ]
+  },
+  "defaultEnabled": false
+}

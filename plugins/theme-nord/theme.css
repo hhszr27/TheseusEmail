@@ -1,0 +1,18 @@
+/* Nord 主题：只覆盖契约变量，不含外部资源与 @import */
+:root {
+  --mf-color-bg: #2e3440;
+  --mf-color-surface: #3b4252;
+  --mf-color-surface-raised: #434c5e;
+  --mf-color-surface-hover: #4c566a;
+  --mf-color-text: #eceff4;
+  --mf-color-text-secondary: #d8dee9;
+  --mf-color-text-muted: #a3abbc;
+  --mf-color-accent: #88c0d0;
+  --mf-color-accent-contrast: #2e3440;
+  --mf-color-border: #4c566a;
+  --mf-color-border-strong: #5e6a80;
+  --mf-color-danger: #bf616a;
+  --mf-color-warning: #ebcb8b;
+  --mf-color-success: #a3be8c;
+  --mf-shadow-panel: 0 8px 24px rgba(20, 24, 31, 0.5);
+}

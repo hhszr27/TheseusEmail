@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>侧栏示例插件</title>
+    <style>
+      :root {
+        /* 兜底值跟随宿主默认浅色主题；深色由宿主下发 --mf-color-* 覆盖 */
+        --bg: var(--mf-color-bg, #f3f4f6);
+        --panel: var(--mf-color-surface, #ffffff);
+        --border: var(--mf-color-border, #e5e7eb);
+        --text: var(--mf-color-text, #1a1a1a);
+        --text2: var(--mf-color-text-secondary, #6b7280);
+        --muted: var(--mf-color-text-muted, #9ca3af);
+        --danger: var(--mf-color-danger, #dc2626);
+        --radius: var(--mf-radius-md, 8px);
+        --u: var(--mf-spacing-unit, 8px);
+        --font: var(--mf-font-family, system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif);
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font: 13px/1.6 var(--font);
+        padding: calc(var(--u) * 2);
+      }
+      h1 { font-size: 15px; margin: 0 0 4px; }
+      .sub { color: var(--muted); margin: 0 0 16px; }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: calc(var(--u) * 1.5);
+        margin-bottom: calc(var(--u) * 1.5);
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .row:last-child { border-bottom: 0; }
+      .name { font-weight: 600; }
+      .mail { color: var(--text2); font-size: 12px; word-break: break-all; }
+      .hint { color: var(--muted); }
+      .err { color: var(--danger); }
+      .retry {
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text);
+        border-radius: 6px;
+        padding: 4px 12px;
+        cursor: pointer;
+        font: inherit;
+      }
+      .retry:hover { border-color: var(--text2); }
+    </style>
+  </head>
+  <body>
+    <h1>侧栏示例插件</h1>
+    <p class="sub">
+      入口在侧栏底部的「邮件 / 日历 / 联系人」旁边；点开后右侧主区域渲染的就是这个页面。
+    </p>
+    <div class="card">
+      <div id="accounts" class="hint">正在读取账户…</div>
+    </div>
+    <p class="hint">
+      这个示例演示两件事：插件可以通过 <code>views['sidebar-item']</code> 在侧栏导航里加一个图标；
+      点开后由宿主在主区域渲染插件自己的页面。不需要它时，删掉 <code>plugins/sidebar-demo</code> 目录即可。
+    </p>
+    <script src="view.js" defer></script>
+  </body>
+</html>

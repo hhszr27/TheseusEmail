@@ -1,0 +1,82 @@
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: #161b22;
+  color: #e6edf3;
+  font: 13px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cn-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #2b323c;
+}
+
+.cn-badge {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1px solid #3d5a80;
+  color: #8fb6e6;
+}
+
+.cn-subject {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cn-recipients {
+  padding: 8px 12px 0;
+  color: #9aa7b8;
+  font-size: 12px;
+}
+
+.cn-body {
+  flex: 1;
+  margin: 8px 12px;
+  padding: 10px;
+  border: 1px solid #2b323c;
+  border-radius: 6px;
+  background: #10151b;
+  color: #dfe7f1;
+  font: 12px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow: auto;
+}
+
+.cn-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid #2b323c;
+}
+
+.cn-foot button {
+  padding: 6px 10px;
+  border: 1px solid #2f3a47;
+  border-radius: 6px;
+  background: #1d242e;
+  color: #dfe7f1;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.cn-foot button:hover {
+  background: #26303c;
+}
+
+.cn-hint {
+  color: #8b98a8;
+  font-size: 12px;
+}
